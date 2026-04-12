@@ -10,7 +10,7 @@
 
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
-  <main class="w-full max-w-md">
+  <main class="w-full max-w-md relative">
 
     <article data-testid="test-todo-card"
       class="bg-white rounded-xl shadow-lg p-6 space-y-4">
@@ -27,6 +27,7 @@
               data-testid="test-todo-complete-toggle"
               aria-label="Mark task as complete"
               class="task-checkbox opacity-0 absolute"
+              tabindex="0"
             />
 
             <div class="w-6 h-6 border-2 border-gray-400 rounded-md flex items-center justify-center">
@@ -43,7 +44,9 @@
           <div class="ml-auto">
 
             <span data-testid="test-todo-status"
-              class="task-status text-xs font-medium">
+              class="task-status text-xs font-medium"
+              aria-live="polite"
+              aria-atomic="true">
               Pending
             </span>
 
@@ -88,9 +91,9 @@
             Edit
           </button>
 
-          <button data-testid="test-todo-delete-button"
-            class="px-3 py-1 text-sm bg-red-100 text-red-600 rounded-lg"
-            onclick="alert('Delete clicked')">
+          <button id="deleteButton" data-testid="test-todo-delete-button"
+            class="px-3 py-1 text-sm bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
+            type="button">
             Delete
           </button>
 
@@ -99,6 +102,12 @@
       </div>
 
     </article>
+
+    <div id="deleteDialog" class="hidden absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full w-full max-w-sm px-4">
+      <div class="bg-white border border-gray-200 shadow-2xl rounded-2xl px-4 py-3 text-sm font-medium text-gray-800 text-center">
+        Delete clicked
+      </div>
+    </div>
 
   </main>
 
