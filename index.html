@@ -5,76 +5,106 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>HNG Todo Card</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=line-clamp"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
-  <main class="w-full max-w-md relative">
+  <main class="w-full max-w-md">
+
+    <div id="deleteDialog" class="hidden mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      <p class="mb-3">Delete is clicked</p>
+      <div class="flex justify-end">
+        <button id="dismissDelete" class="px-3 py-1 rounded bg-red-500 text-white">OK</button>
+      </div>
+    </div>
 
     <article data-testid="test-todo-card"
-      class="bg-white rounded-xl shadow-lg p-6 space-y-4">
+      class="bg-gradient-to-br from-indigo-50 to-cyan-50 rounded-xl shadow-lg p-6 space-y-4">
 
-      <!-- CONTENT -->
-      <div class="task-content space-y-2">
+      <div class="task-content space-y-3">
 
+        <!-- TOP ROW -->
         <div class="flex items-center gap-3">
 
-          <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox"
+            data-testid="test-todo-complete-toggle"
+            class="task-checkbox"
+            aria-label="Mark task as complete"/>
 
-            <input 
-              type="checkbox"
-              data-testid="test-todo-complete-toggle"
-              aria-label="Mark task as complete"
-              class="task-checkbox opacity-0 absolute"
-              tabindex="0"
-            />
+          <span class="checkmark hidden">✓</span>
 
-            <div class="w-6 h-6 border-2 border-gray-400 rounded-md flex items-center justify-center">
-              <span class="checkmark hidden">✓</span>
-            </div>
+          <!-- PRIORITY -->
+          <div class="flex items-center gap-2">
+            <span id="priorityIndicator"
+              data-testid="test-todo-priority-indicator"
+              class="w-3 h-3 rounded-full bg-red-500"></span>
 
-          </label>
+            <span data-testid="test-todo-priority"
+              class="text-xs px-2 py-1 rounded-full bg-red-100 text-red-600 font-semibold">
+              High
+            </span>
+          </div>
 
-          <span data-testid="test-todo-priority"
-            class="text-xs px-2 py-1 rounded-full bg-red-100 text-red-600 font-semibold">
-            High
-          </span>
-
-          <div class="ml-auto">
-
+          <!-- STATUS -->
+          <div class="ml-auto flex items-center gap-2">
             <span data-testid="test-todo-status"
               class="task-status text-xs font-medium"
-              aria-live="polite"
-              aria-atomic="true">
+              aria-live="polite">
               Pending
             </span>
 
+            <select data-testid="test-todo-status-control"
+              class="text-xs border rounded px-2 py-1"
+              aria-label="Task status control">
+              <option>Pending</option>
+              <option>In Progress</option>
+              <option>Done</option>
+            </select>
           </div>
 
         </div>
 
+        <!-- TITLE -->
         <h2 data-testid="test-todo-title"
           class="task-title text-xl font-bold text-gray-800">
           Finish Project Proposal
         </h2>
 
-        <p data-testid="test-todo-description"
-          class="text-gray-600 text-sm">
-          Review the final draft and send it to the client for approval.
-        </p>
+        <!-- DESCRIPTION -->
+        <div data-testid="test-todo-collapsible-section" id="descSection">
+          <p data-testid="test-todo-description"
+            id="descText"
+            class="text-gray-600 text-sm line-clamp-2">
+            Review the final draft and send it to the client for approval. Add more long text here to test expand and collapse behavior properly.
+          </p>
+        </div>
 
+        <button data-testid="test-todo-expand-toggle"
+          id="expandBtn"
+          class="text-blue-600 text-xs"
+          aria-expanded="false"
+          aria-controls="descSection">
+          Show more
+        </button>
+
+        <!-- DATE -->
         <p class="text-sm text-gray-500">
           📅 <time data-testid="test-todo-due-date" datetime="2026-03-01">
             Due March 1, 2026
           </time>
         </p>
 
+        <!-- TIME -->
         <p class="text-sm text-blue-600 font-medium">
-          ⏳ <span data-testid="test-todo-time-remaining">
-            Due in 3 days
-          </span>
+          ⏳ <span data-testid="test-todo-time-remaining" aria-live="polite"></span>
         </p>
+
+        <span data-testid="test-todo-overdue-indicator"
+          id="overdueIndicator"
+          class="hidden text-xs text-red-600 font-semibold">
+          Overdue
+        </span>
 
         <!-- TAGS -->
         <ul data-testid="test-todo-tags" class="flex gap-2 flex-wrap">
@@ -84,30 +114,67 @@
 
         <!-- ACTIONS -->
         <div class="flex justify-end gap-2 pt-3">
-
           <button data-testid="test-todo-edit-button"
-            class="px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded-lg"
-            onclick="console.log('edit clicked')">
+            class="px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded-lg">
             Edit
           </button>
 
-          <button id="deleteButton" data-testid="test-todo-delete-button"
-            class="px-3 py-1 text-sm bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
-            type="button">
+          <button data-testid="test-todo-delete-button"
+            class="px-3 py-1 text-sm bg-red-100 text-red-600 rounded-lg">
             Delete
           </button>
-
         </div>
 
       </div>
 
-    </article>
+      <!-- EDIT FORM -->
+      <form data-testid="test-todo-edit-form"
+        id="editForm"
+        class="hidden space-y-3 mt-4">
 
-    <div id="deleteDialog" class="hidden absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full w-full max-w-sm px-4">
-      <div class="bg-white border border-gray-200 shadow-2xl rounded-2xl px-4 py-3 text-sm font-medium text-gray-800 text-center">
-        Delete clicked
-      </div>
-    </div>
+        <label for="editTitle">Title</label>
+        <input id="editTitle"
+          data-testid="test-todo-edit-title-input"
+          class="w-full border px-2 py-1"/>
+
+        <label for="editDescription">Description</label>
+        <textarea id="editDescription"
+          data-testid="test-todo-edit-description-input"
+          class="w-full border px-2 py-1"></textarea>
+
+        <label for="editPriority">Priority</label>
+        <select id="editPriority"
+          data-testid="test-todo-edit-priority-select"
+          class="w-full border px-2 py-1">
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+
+        <label for="editDate">Due Date</label>
+        <input type="date" id="editDate"
+          data-testid="test-todo-edit-due-date-input"
+          class="w-full border px-2 py-1"/>
+
+        <div class="flex gap-2 justify-end">
+          <button type="button"
+            id="cancelEdit"
+            data-testid="test-todo-cancel-button"
+            class="bg-gray-200 px-3 py-1 rounded">
+            Cancel
+          </button>
+
+          <button type="button"
+            id="saveEdit"
+            data-testid="test-todo-save-button"
+            class="bg-blue-500 text-white px-3 py-1 rounded">
+            Save
+          </button>
+        </div>
+
+      </form>
+
+    </article>
 
   </main>
 
